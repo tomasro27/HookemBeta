@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffff6300"
+    tools:context="rodrigueztomas.com.hookembeta.SignUpFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:background="#00ACB2"
+        android:hint="USERNAME"
+        android:textSize="50sp"
+        android:textColorHint="#ffffff"
+        android:gravity="center"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:id="@+id/passcode"
+        android:layout_below="@id/username"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:background="#00F6FF"
+        android:hint="PASSCODE"
+        android:textSize="50sp"
+        android:textColorHint="#ffffff"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:inputType="numberPassword"
+        />
+
+    <Button
+        android:id="@+id/taptosignup"
+        android:layout_below="@id/passcode"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:background="#B24500"
+        android:text="@string/tapsignup"
+        android:textSize="50sp"
+        android:textColor="#ffffff"
+        />
+
+</RelativeLayout>
