@@ -31,6 +31,7 @@ public class HookemFragment extends Fragment {
     private ListView friendsListView;
     private Button plusButton;
     private EditText addFriendEditText;
+    private Button logoutButton;
 
 
     public static HookemFragment newInstance() {
@@ -58,6 +59,11 @@ public class HookemFragment extends Fragment {
         friendsListView = (ListView) v.findViewById(R.id.friends);
         plusButton = (Button) v.findViewById(R.id.plus);
         addFriendEditText = (EditText) v.findViewById(R.id.addFriend);
+        logoutButton = (Button) v.findViewById(R.id.logout);
+
+        plusButton.setTypeface(MainActivity.MonseratBold(getActivity().getApplicationContext()));
+        addFriendEditText.setTypeface(MainActivity.MonseratBold(getActivity().getApplicationContext()));
+        logoutButton.setTag(MainActivity.MonseratBold(getActivity().getApplicationContext()));
 
 
 
@@ -66,6 +72,18 @@ public class HookemFragment extends Fragment {
             public void onClick(View v) {
                 plusButton.setVisibility(View.GONE);
                 addFriendEditText.setVisibility(View.VISIBLE);
+            }
+        });
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                currentUser.logOut();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, LoginSignupFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

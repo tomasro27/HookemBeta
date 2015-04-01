@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="rodrigueztomas.com.hookembeta.LoginFragment">
@@ -17,7 +17,7 @@
 
     <EditText
         android:id="@+id/passcodeLogin"
-        android:layout_below="@id/username"
+        android:layout_below="@id/usernameLogin"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:background="#00F6FF"
@@ -32,7 +32,7 @@
 
     <Button
         android:id="@+id/taptologin"
-        android:layout_below="@id/passcode"
+        android:layout_below="@id/passcodeLogin"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:background="#B24500"
@@ -41,4 +41,4 @@
         android:textColor="#ffffff"
         />
 
-</FrameLayout>
+</RelativeLayout>

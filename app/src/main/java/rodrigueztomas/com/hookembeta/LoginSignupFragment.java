@@ -1,7 +1,5 @@
 package rodrigueztomas.com.hookembeta;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,18 +9,18 @@ import android.widget.Button;
 
 
 
-public class MainFragment extends Fragment {
+public class LoginSignupFragment extends Fragment {
 
     private Button loginButton;
     private Button signupButton;
 
-    public static MainFragment newInstance() {
-        MainFragment fragment = new MainFragment();
+    public static LoginSignupFragment newInstance() {
+        LoginSignupFragment fragment = new LoginSignupFragment();
 
         return fragment;
     }
 
-    public MainFragment() {
+    public LoginSignupFragment() {
         // Required empty public constructor
     }
 
@@ -50,6 +48,16 @@ public class MainFragment extends Fragment {
             public void onClick(View v) {
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container, SignUpFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, LoginFragment.newInstance())
                         .addToBackStack(null)
                         .commit();
             }

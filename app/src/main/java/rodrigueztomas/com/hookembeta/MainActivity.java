@@ -1,17 +1,12 @@
 package rodrigueztomas.com.hookembeta;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -36,12 +31,29 @@ public class MainActivity extends ActionBarActivity {
 
         ParseACL.setDefaultACL(defaultACL, true);
 
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if(currentUser != null)
+        {
+            if(savedInstanceState == null)
+            {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, HookemFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
+            }
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, MainFragment.newInstance())
-                    .commit();
         }
+        else
+        {
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, LoginSignupFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        }
+
+
     }
 
 
