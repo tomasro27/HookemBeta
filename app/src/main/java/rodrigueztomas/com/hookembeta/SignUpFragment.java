@@ -63,7 +63,7 @@ public class SignUpFragment extends Fragment {
         tapToSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String usernameString = usernameEditText.getText().toString();
+                String usernameString = usernameEditText.getText().toString().toUpperCase();
 //                if(!android.util.Patterns.EMAIL_ADDRESS.matcher(usernameString).matches())
 //                {
 //                    etEmail.setError("Invalid etEmail address.");
@@ -82,7 +82,7 @@ public class SignUpFragment extends Fragment {
                 }
 
                 ParseUser user = new ParseUser();
-                user.setUsername(usernameString.toLowerCase());
+                user.setUsername(usernameString.toUpperCase());
                 user.setPassword(password);
 
                 user.signUpInBackground(new SignUpCallback() {
@@ -91,8 +91,10 @@ public class SignUpFragment extends Fragment {
                     public void done(com.parse.ParseException e) {
                         if (e == null) {
 
-                            Intent i = new Intent(getActivity().getApplicationContext(), MainActivity.class);
-                            startActivity(i);
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.container, HookemFragment.newInstance())
+                                    .addToBackStack(null)
+                                    .commit();
 
                         } else {
 

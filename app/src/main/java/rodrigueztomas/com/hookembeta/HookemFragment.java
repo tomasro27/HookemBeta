@@ -4,29 +4,37 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.util.List;
 
 public class HookemFragment extends Fragment {
 
+    private ListView friendsListView;
+    private Button plusButton;
+    private EditText addFriendEditText;
 
-    private OnFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HookemFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HookemFragment newInstance(String param1, String param2) {
+    public static HookemFragment newInstance() {
         HookemFragment fragment = new HookemFragment();
-        Bundle args = new Bundle();
-
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -45,46 +53,118 @@ public class HookemFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_hookem, container, false);
+        View v = inflater.inflate(R.layout.fragment_hookem, container, false);
+
+        friendsListView = (ListView) v.findViewById(R.id.friends);
+        plusButton = (Button) v.findViewById(R.id.plus);
+        addFriendEditText = (EditText) v.findViewById(R.id.addFriend);
+
+
+
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                plusButton.setVisibility(View.GONE);
+                addFriendEditText.setVisibility(View.VISIBLE);
+            }
+        });
+
+        addFriendEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(v.toString().length() == 0)
+                    return false;
+                else
+                {
+                    String friendName = addFriendEditText.getText().toString().toUpperCase();
+                    ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                    userQuery.whereEqualTo("username", friendName);
+
+                    userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+
+                            if (e == null && parseUser != null)
+                            {
+                                final ParseUser friend;
+                                friend = parseUser;
+                                final ParseUser currentUser = ParseUser.getCurrentUser();
+
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("FriendRequest");
+                                query.whereEqualTo("fromUser", friend.getObjectId());
+                                query.whereEqualTo("toUser", currentUser.getObjectId());
+
+                                query.findInBackground(new FindCallback<ParseObject>() {
+                                    @Override
+                                    public void done(List<ParseObject> results, ParseException e) {
+                                        if (e == null) {
+                                            if (results.isEmpty()){
+                                                ParseObject friendRequest = new ParseObject("FriendRequest");
+                                                friendRequest.put("fromUser", currentUser.getObjectId());
+                                                friendRequest.put("toUser", friend.getObjectId());
+                                                friendRequest.put("status", "Pending");
+                                                friendRequest.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        if (e == null) {
+                                                            Toast.makeText(getActivity().getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
+                                                            updateFriends();
+
+                                                        } else if (e == null) {
+                                                            Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+
+                                                        }
+                                                    }
+                                                });
+
+
+                                            }
+                                        } else {
+                                            Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+
+
+                            } else if (parseUser == null && e == null) {
+                                Log.d("friendRequest", "user null");
+                                Toast.makeText(getActivity().getApplicationContext(), "No user found with that email address.", Toast.LENGTH_LONG).show();
+                            } else if (e != null) {
+                                Log.d("friendRequest", "parse exception: " + e.toString());
+                                Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                    });
+
+                    return true;
+                }
+            }
+        });
+
+        updateFriends();
+
+
+        return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+    private void updateFriends()
+    {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("FriendRequest");
+        query.whereContains("fromUSer", ParseUser.getCurrentUser().getObjectId());
+        query.whereContains("toUser", ParseUser.getCurrentUser().getObjectId());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                if(e == null)
+                {
+                    FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
+                            getActivity().getLayoutInflater(), parseObjects);
+                    friendsListView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
 }

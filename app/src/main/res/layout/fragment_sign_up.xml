@@ -13,6 +13,7 @@
         android:hint="USERNAME"
         android:textSize="50sp"
         android:textColorHint="#ffffff"
+        android:textColor="#ffffff"
         android:gravity="center"
         android:textAlignment="center"/>
 
@@ -25,6 +26,7 @@
         android:hint="PASSCODE"
         android:textSize="50sp"
         android:textColorHint="#ffffff"
+        android:textColor="#ffffff"
         android:gravity="center"
         android:textAlignment="center"
         android:inputType="numberPassword"

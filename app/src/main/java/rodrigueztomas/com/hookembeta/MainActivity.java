@@ -31,7 +31,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Parse.initialize(this, ParseKeys.PARSE_KEY, ParseKeys.PARSE_SECRET);
+        Parse.initialize(this, ParseKeys.APPLICATION_ID, ParseKeys.CLIENT_KEY);
         ParseACL defaultACL = new ParseACL();
 
         ParseACL.setDefaultACL(defaultACL, true);

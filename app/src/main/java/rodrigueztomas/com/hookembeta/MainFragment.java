@@ -49,7 +49,8 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container, SignUpFragment.newInstance())
+                        .replace(R.id.container, SignUpFragment.newInstance())
+                        .addToBackStack(null)
                         .commit();
             }
         });
