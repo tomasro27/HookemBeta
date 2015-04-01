@@ -37,8 +37,8 @@ public class MainActivity extends ActionBarActivity {
             if(savedInstanceState == null)
             {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, HookemFragment.newInstance())
-                        .addToBackStack(null)
+                        .add(R.id.container, HookemFragment.newInstance())
+
                         .commit();
             }
 
@@ -47,8 +47,8 @@ public class MainActivity extends ActionBarActivity {
         {
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, LoginSignupFragment.newInstance())
-                        .addToBackStack(null)
+                        .add(R.id.container, LoginSignupFragment.newInstance())
+
                         .commit();
             }
         }

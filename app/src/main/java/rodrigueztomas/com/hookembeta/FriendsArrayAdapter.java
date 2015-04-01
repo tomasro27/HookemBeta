@@ -1,14 +1,17 @@
 package rodrigueztomas.com.hookembeta;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -54,8 +57,34 @@ public class FriendsArrayAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             convertView = inflater.inflate(R.layout.item_row_friends, null);
             viewHolder.friendNameButton = (Button) convertView.findViewById(R.id.friendsItemRow);
-            viewHolder.friendNameButton.setText(friends.get(position).toString());
+
+            String from = (String) friends.get(position).get("fromUsername");
+            String to = (String) friends.get(position).get("toUsername");
+            String friendName = "";
+
+            if(ParseUser.getCurrentUser().getUsername().equals(from))
+            {
+                friendName = to;
+            }
+            else
+            {
+                friendName = from;
+            }
+            viewHolder.friendNameButton.setText(friendName);
             viewHolder.friendNameButton.setTypeface(MainActivity.MonseratBold(context));
+
+
+            viewHolder.friendNameButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+
+                    Toast.makeText(context, "HOOKEM sent!", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
             convertView.setTag(viewHolder);
         }
         else

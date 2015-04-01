@@ -1,6 +1,7 @@
 package rodrigueztomas.com.hookembeta;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -24,6 +26,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HookemFragment extends Fragment {
@@ -32,6 +35,8 @@ public class HookemFragment extends Fragment {
     private Button plusButton;
     private EditText addFriendEditText;
     private Button logoutButton;
+
+    private List<ParseObject> friends;
 
 
     public static HookemFragment newInstance() {
@@ -87,7 +92,11 @@ public class HookemFragment extends Fragment {
             }
         });
 
+
         addFriendEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+
+
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(v.toString().length() == 0)
@@ -120,6 +129,9 @@ public class HookemFragment extends Fragment {
                                                 ParseObject friendRequest = new ParseObject("FriendRequest");
                                                 friendRequest.put("fromUser", currentUser.getObjectId());
                                                 friendRequest.put("toUser", friend.getObjectId());
+                                                friendRequest.put("fromUsername", currentUser.getUsername());
+                                                friendRequest.put("toUsername", friend.getUsername());
+
                                                 friendRequest.put("status", "Pending");
                                                 friendRequest.saveInBackground(new SaveCallback() {
                                                     @Override
@@ -127,6 +139,13 @@ public class HookemFragment extends Fragment {
                                                         if (e == null) {
                                                             Toast.makeText(getActivity().getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
                                                             updateFriends();
+                                                            addFriendEditText.setText("");
+                                                            addFriendEditText.setVisibility(View.GONE);
+                                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                            imm.hideSoftInputFromWindow(addFriendEditText.getWindowToken(), 0);
+                                                            plusButton.setVisibility(View.VISIBLE);
+
+
 
                                                         } else if (e == null) {
                                                             Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
@@ -157,6 +176,7 @@ public class HookemFragment extends Fragment {
 
                     return true;
                 }
+
             }
         });
 
@@ -168,21 +188,34 @@ public class HookemFragment extends Fragment {
 
     private void updateFriends()
     {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("FriendRequest");
-        query.whereContains("fromUSer", ParseUser.getCurrentUser().getObjectId());
-        query.whereContains("toUser", ParseUser.getCurrentUser().getObjectId());
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if(e == null)
-                {
-                    FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
-                            getActivity().getLayoutInflater(), parseObjects);
-                    friendsListView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                }
+        ParseQuery<ParseObject> query1 = ParseQuery.getQuery("FriendRequest");
+        query1.whereEqualTo("toUser", ParseUser.getCurrentUser().getObjectId());
+
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("FriendRequest");
+        query2.whereEqualTo("fromUser", ParseUser.getCurrentUser().getObjectId());
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
+        queries.add(query1);
+        queries.add(query2);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> results, ParseException e) {
+                // results of all the friend Requests
+
+                 Log.d("HookemFragment", "Parse: " + results.size() + "  " + results.toString());
+
+                friends = results;
+
+                FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
+                        getActivity().getLayoutInflater(), results);
+                friendsListView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             }
         });
+
+
+
     }
 
 }
