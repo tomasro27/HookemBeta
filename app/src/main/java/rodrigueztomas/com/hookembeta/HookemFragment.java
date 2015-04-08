@@ -38,6 +38,7 @@ public class HookemFragment extends Fragment {
     private Button plusButton;
     private EditText addFriendEditText;
     private Button logoutButton;
+    private final String LOG_TAG = "HookemFragment";
 
     private List<ParseObject> friends;
 
@@ -82,17 +83,13 @@ public class HookemFragment extends Fragment {
         friendsListView = (ListView) v.findViewById(R.id.friends);
 
 
-
-
-
         plusButton = (Button) v.findViewById(R.id.plus);
         addFriendEditText = (EditText) v.findViewById(R.id.addFriend);
         logoutButton = (Button) v.findViewById(R.id.logout);
 
         plusButton.setTypeface(MainActivity.MonseratBold(getActivity().getApplicationContext()));
         addFriendEditText.setTypeface(MainActivity.MonseratBold(getActivity().getApplicationContext()));
-        logoutButton.setTag(MainActivity.MonseratBold(getActivity().getApplicationContext()));
-
+        logoutButton.setTypeface(MainActivity.MonseratBold(getActivity().getApplicationContext()));
 
 
         plusButton.setOnClickListener(new View.OnClickListener() {
@@ -119,13 +116,14 @@ public class HookemFragment extends Fragment {
         addFriendEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
 
-
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(v.toString().length() == 0)
+                if (v.toString().length() == 0)
                     return false;
-                else
+                else if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == KeyEvent.ACTION_DOWN)
                 {
+                    Log.v(LOG_TAG, "onEditorAction: " + event.toString());
                     String friendName = addFriendEditText.getText().toString().toUpperCase();
                     ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
                     userQuery.whereEqualTo("username", friendName);
@@ -134,21 +132,20 @@ public class HookemFragment extends Fragment {
                         @Override
                         public void done(ParseUser parseUser, ParseException e) {
 
-                            if (e == null && parseUser != null)
-                            {
+                            if (e == null && parseUser != null) {
                                 final ParseUser friend;
                                 friend = parseUser;
                                 final ParseUser currentUser = ParseUser.getCurrentUser();
 
                                 ParseQuery<ParseObject> query = ParseQuery.getQuery("FriendRequest");
-                                query.whereEqualTo("fromUser", friend.getObjectId());
-                                query.whereEqualTo("toUser", currentUser.getObjectId());
+                                query.whereEqualTo("fromUser", currentUser.getObjectId());
+                                query.whereEqualTo("toUser", friend.getObjectId());
 
                                 query.findInBackground(new FindCallback<ParseObject>() {
                                     @Override
                                     public void done(List<ParseObject> results, ParseException e) {
                                         if (e == null) {
-                                            if (results.isEmpty()){
+                                            if (results.isEmpty()) {
                                                 ParseObject friendRequest = new ParseObject("FriendRequest");
                                                 friendRequest.put("fromUser", currentUser.getObjectId());
                                                 friendRequest.put("toUser", friend.getObjectId());
@@ -164,10 +161,9 @@ public class HookemFragment extends Fragment {
                                                             updateFriends();
                                                             addFriendEditText.setText("");
                                                             addFriendEditText.setVisibility(View.GONE);
-                                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                                                             imm.hideSoftInputFromWindow(addFriendEditText.getWindowToken(), 0);
                                                             plusButton.setVisibility(View.VISIBLE);
-
 
 
                                                         } else if (e == null) {
@@ -178,7 +174,10 @@ public class HookemFragment extends Fragment {
                                                 });
 
 
+                                            } else {
+                                                Toast.makeText(getActivity().getApplicationContext(), "You are already friends with this person!", Toast.LENGTH_LONG).show();
                                             }
+
                                         } else {
                                             Toast.makeText(getActivity().getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
                                         }
@@ -199,9 +198,12 @@ public class HookemFragment extends Fragment {
 
                     return true;
                 }
-
+                return true;
             }
+
         });
+
+
 
         updateFriends();
 
@@ -226,46 +228,52 @@ public class HookemFragment extends Fragment {
             public void done(List<ParseObject> results, ParseException e) {
                 // results of all the friend Requests
 
-                 Log.d("HookemFragment", "Parse: " + results.size() + "  " + results.toString());
+                if(e == null)
+                {
+                    Log.v(LOG_TAG, "results size: " + results.size() + "   results: " + results.toString());
 
-                friends = results;
+                    Log.d(LOG_TAG, "Parse: " + results.size() + "  " + results.toString());
 
-                FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
-                        getActivity().getLayoutInflater(), results);
-                friendsListView.setAdapter(adapter);
+                    friends = results;
 
-                friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Toast.makeText(getActivity().getApplicationContext(), "HOOKEM sent!", Toast.LENGTH_LONG).show();
-                        Log.d("HookemFragment", "ONITEMCLICKLISTENER");
+                    FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
+                            getActivity().getLayoutInflater(), results);
+                    friendsListView.setAdapter(adapter);
 
-
-                        TextView tv = (TextView) parent.getChildAt(position).findViewById(R.id.friendsItemRow);
-                        String friendClicked = tv.getText().toString();
-                        Log.v("HookemFragment ", "friend clicked is " + friendClicked);
-
-
-                        ParseQuery pushQuery = ParseInstallation.getQuery();
-                        pushQuery.whereEqualTo("username", friendClicked);
+                    friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Toast.makeText(getActivity().getApplicationContext(), "HOOKEM sent!", Toast.LENGTH_LONG).show();
+                            Log.d(LOG_TAG, "ONITEMCLICKLISTENER");
 
 
+                            TextView tv = (TextView) parent.getChildAt(position).findViewById(R.id.friendsItemRow);
+                            String friendClicked = tv.getText().toString();
+                            Log.v( LOG_TAG, "friend clicked is " + friendClicked);
 
-                        // Send push notification to query
-                        ParsePush push = new ParsePush();
-                        push.setQuery(pushQuery); // Set our Installation query
 
-                        push.setMessage("HOOKEM");
-
-                        push.sendInBackground();
+                            ParseQuery pushQuery = ParseInstallation.getQuery();
+                            pushQuery.whereEqualTo("username", friendClicked);
 
 
 
-                    }
-                });
+                            // Send push notification to query
+                            ParsePush push = new ParsePush();
+                            push.setQuery(pushQuery); // Set our Installation query
+
+                            push.setMessage("HOOKEM");
+
+                            push.sendInBackground();
 
 
-                adapter.notifyDataSetChanged();
+
+                        }
+                    });
+
+
+                    adapter.notifyDataSetChanged();
+                }
+
             }
         });
 

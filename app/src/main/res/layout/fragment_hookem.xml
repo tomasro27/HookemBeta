@@ -44,7 +44,7 @@
         android:id="@+id/logout"
         android:layout_width="fill_parent"
         android:layout_height="100dp"
-        android:background="@color/dark_orange"
+        android:background="@color/orange"
         android:text="Logout"
         android:textSize="50sp"
         android:textColor="#ffffff"
