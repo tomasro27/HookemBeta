@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -62,6 +63,11 @@ public class HookemFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_hookem, container, false);
 
         friendsListView = (ListView) v.findViewById(R.id.friends);
+
+
+
+
+
         plusButton = (Button) v.findViewById(R.id.plus);
         addFriendEditText = (EditText) v.findViewById(R.id.addFriend);
         logoutButton = (Button) v.findViewById(R.id.logout);
@@ -210,6 +216,18 @@ public class HookemFragment extends Fragment {
                 FriendsArrayAdapter adapter = new FriendsArrayAdapter(getActivity().getApplicationContext(),
                         getActivity().getLayoutInflater(), results);
                 friendsListView.setAdapter(adapter);
+
+                friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Toast.makeText(getActivity().getApplicationContext(), "HOOKEM sent!", Toast.LENGTH_LONG).show();
+                        Log.d("HookemFragment", "ONITEMCLICKLISTENER");
+
+
+                    }
+                });
+
+
                 adapter.notifyDataSetChanged();
             }
         });
