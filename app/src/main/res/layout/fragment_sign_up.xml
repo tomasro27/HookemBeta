@@ -4,7 +4,6 @@
     android:background="#ffff6300"
     tools:context="rodrigueztomas.com.hookembeta.SignUpFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <EditText
         android:id="@+id/username"
         android:layout_width="fill_parent"

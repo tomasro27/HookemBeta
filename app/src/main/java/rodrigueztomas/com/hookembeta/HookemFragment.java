@@ -261,7 +261,7 @@ public class HookemFragment extends Fragment {
                             ParsePush push = new ParsePush();
                             push.setQuery(pushQuery); // Set our Installation query
 
-                            push.setMessage("HOOKEM");
+                            push.setMessage(ParseUser.getCurrentUser().getUsername() + " sent you a HOOKEM!!!");
 
                             push.sendInBackground();
 
