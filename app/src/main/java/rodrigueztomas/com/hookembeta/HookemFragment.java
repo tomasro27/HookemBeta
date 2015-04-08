@@ -22,7 +22,9 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -52,8 +54,23 @@ public class HookemFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+
+        // Associate the device with a user
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("user",ParseUser.getCurrentUser());
+        installation.put("username", ParseUser.getCurrentUser().getUsername());
+        installation.saveInBackground();
+
+        ParsePush.subscribeInBackground("", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                }
+            }
+        });
     }
 
     @Override
@@ -222,6 +239,26 @@ public class HookemFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Toast.makeText(getActivity().getApplicationContext(), "HOOKEM sent!", Toast.LENGTH_LONG).show();
                         Log.d("HookemFragment", "ONITEMCLICKLISTENER");
+
+
+                        TextView tv = (TextView) parent.getChildAt(position).findViewById(R.id.friendsItemRow);
+                        String friendClicked = tv.getText().toString();
+                        Log.v("HookemFragment ", "friend clicked is " + friendClicked);
+
+
+                        ParseQuery pushQuery = ParseInstallation.getQuery();
+                        pushQuery.whereEqualTo("username", friendClicked);
+
+
+
+                        // Send push notification to query
+                        ParsePush push = new ParsePush();
+                        push.setQuery(pushQuery); // Set our Installation query
+
+                        push.setMessage("HOOKEM");
+
+                        push.sendInBackground();
+
 
 
                     }

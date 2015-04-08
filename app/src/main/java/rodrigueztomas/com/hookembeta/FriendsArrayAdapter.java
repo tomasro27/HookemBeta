@@ -34,6 +34,7 @@ public class FriendsArrayAdapter extends BaseAdapter {
         this.friends = friends;
     }
 
+
     @Override
     public int getCount() {
         return friends.size();
@@ -46,7 +47,7 @@ public class FriendsArrayAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -75,30 +76,22 @@ public class FriendsArrayAdapter extends BaseAdapter {
             viewHolder.friendNameButton.setTypeface(MainActivity.MonseratBold(context));
 
 
-
-//            viewHolder.friendNameButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//
-//
-//                    Toast.makeText(context, "HOOKEM sent!", Toast.LENGTH_LONG).show();
-//                }
-//            });
-
-            switch(position%4)
+            switch(position%5)
             {
                 case 0:
-                    viewHolder.friendNameButton.setBackgroundColor(R.color.light_blue);
+                    viewHolder.friendNameButton.setBackgroundColor(context.getResources().getColor(R.color.light_blue));
                     break;
                 case 1:
-                    viewHolder.friendNameButton.setBackgroundColor(R.color.blue);
+                    viewHolder.friendNameButton.setBackgroundColor(context.getResources().getColor(R.color.blue));
                     break;
                 case 2:
-                    viewHolder.friendNameButton.setBackgroundColor(R.color.dark_orange);
+                    viewHolder.friendNameButton.setBackgroundColor(context.getResources().getColor(R.color.orange));
                     break;
                 case 3:
-                    viewHolder.friendNameButton.setBackgroundColor(R.color.light_orange);
+                    viewHolder.friendNameButton.setBackgroundColor(context.getResources().getColor(R.color.light_orange));
+                    break;
+                case 4:
+                    viewHolder.friendNameButton.setBackgroundColor(context.getResources().getColor(R.color.dark_orange));
                     break;
             }
 
@@ -110,14 +103,6 @@ public class FriendsArrayAdapter extends BaseAdapter {
         {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
-//        viewHolder.friendNameButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //TODO: PUSH NOTIFICATION
-//            }
-//        });
-
 
 
 
